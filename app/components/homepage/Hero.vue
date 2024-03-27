@@ -23,9 +23,14 @@
                 v-model="state.email"
               />
             </UFormGroup>
-            <UButton class="text-xl bg-primary" type="submit"
-              >Join Waitlist</UButton
+            <UButton
+              class="text-xl"
+              :class="success ? 'bg-success' : 'bg-primary'"
+              type="submit"
             >
+              <span v-if="!success">Join Waitlist</span>
+              <span v-else>Joined!</span>
+            </UButton>
           </div>
         </UForm>
       </div>
@@ -44,7 +49,12 @@
 <script setup lang="ts">
 import type { FormSubmitEvent } from "#ui/types";
 import { z } from "zod";
+import { useAPIFetch } from "~/composables/useAPIFetch";
 
+type BaseApiResponse = {
+  success: boolean;
+  message: string;
+};
 const schema = z.object({
   email: z.string().email("Invalid email"),
 });
@@ -52,11 +62,22 @@ const schema = z.object({
 type Schema = z.output<typeof schema>;
 
 const state = reactive({
-  email: undefined,
+  email: "",
 });
+const success = ref(false);
+const errorMessage = ref<string>("");
 
-const onSubmit = (event: FormSubmitEvent<Schema>) => {
-  console.log(`Email captured: ${event.data.email}`);
+const onSubmit = async (event: FormSubmitEvent<Schema>) => {
+  const { data, pending } = await useAPIFetch<BaseApiResponse>("/waitlist", {
+    method: "POST",
+    body: JSON.stringify(event.data.email),
+  });
+  if (data.value?.success) {
+    success.value = true;
+  } else {
+    success.value = false;
+    errorMessage.value = data.value?.message || "";
+  }
 };
 </script>
 

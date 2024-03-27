@@ -40,7 +40,7 @@ func (app *application) registerWaitlistUser(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	err = app.writeJSON(w, http.StatusCreated, envelope{"email": waitlist.Email, "message": "email added to waitlist"}, nil)
+	err = app.writeJSON(w, http.StatusCreated, envelope{"success": true, "message": "email added to waitlist"}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}
