@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"os"
 	"pagewise/internal/data"
+	"pagewise/mailer"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -36,6 +37,7 @@ type application struct {
 	config config
 	logger *slog.Logger
 	models data.Models
+	mailer mailer.Mailer
 }
 
 func main() {
@@ -48,6 +50,12 @@ func main() {
 	flag.IntVar(&cfg.db.maxOpenConns, "db-max-open-conns", 25, "PostgreSQL max open connections")
 	flag.IntVar(&cfg.db.maxIdleConns, "db-max-idle-conns", 25, "PostgreSQL max idle connections")
 	flag.DurationVar(&cfg.db.maxIdleTime, "db-max-idle-time", 15*time.Minute, "PostgreSQL max connection idle time")
+
+	flag.StringVar(&cfg.smtp.host, "smtp-host", "sandbox.smtp.mailtrap.io", "SMTP host")
+	flag.IntVar(&cfg.smtp.port, "smtp-port", 25, "SMTP port")
+	flag.StringVar(&cfg.smtp.username, "smtp-username", "46005d9014e66d", "SMTP username")
+	flag.StringVar(&cfg.smtp.password, "smtp-password", "e253e89b1f7618", "SMTP password")
+	flag.StringVar(&cfg.smtp.sender, "smtp-sender", "PageWise <no-reply@pagewise.com>", "SMTP sender")
 
 	flag.Parse()
 
@@ -67,6 +75,7 @@ func main() {
 		config: cfg,
 		logger: logger,
 		models: data.NewModels(db),
+		mailer: mailer.New(cfg.smtp.host, cfg.smtp.port, cfg.smtp.username, cfg.smtp.password, cfg.smtp.sender),
 	}
 
 	err = app.serve()

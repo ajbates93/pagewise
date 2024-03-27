@@ -31,9 +31,14 @@ func (app *application) registerWaitlistUser(w http.ResponseWriter, r *http.Requ
 		default:
 			app.serverErrorResponse(w, r, err)
 		}
+		return
 	}
 
-	// Add SMTP stuff here
+	err = app.mailer.Send(waitlist.Email, "waitlist_confirmation.tmpl", waitlist)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
 
 	err = app.writeJSON(w, http.StatusCreated, envelope{"email": waitlist.Email, "message": "email added to waitlist"}, nil)
 	if err != nil {
