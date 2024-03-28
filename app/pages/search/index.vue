@@ -23,15 +23,38 @@
       <div></div>
     </LayoutDeviceHeightContainer>
     <LayoutDeviceHeightContainer>
-      <div class="p-20">
-        <h2 class="text-3xl">Results</h2>
-        <div id="results" v-for="(book, idx) in searchResults">
-          <div>
-            <h3>{{ book.volumeInfo.title }}</h3>
-            <p class="text-gray-400">
-              {{ book.volumeInfo.authors.join(", ") }}
+      <div>
+        <h2 class="text-3xl mb-10">Results</h2>
+        <div
+          id="results"
+          v-for="(book, idx) in searchResults"
+          class="mb-10 flex pb-10 border-b border-gray"
+        >
+          <div
+            class="book-image mr-10"
+            v-if="book.volumeInfo.imageLinks.thumbnail"
+          >
+            <img
+              class="w-[120px] max-w-none"
+              :src="book.volumeInfo.imageLinks.thumbnail"
+              alt="Book cover"
+            />
+          </div>
+          <div class="book-content">
+            <div class="book-title mb-5">
+              <h3 class="text-xl">{{ book.volumeInfo.title }}</h3>
+              <p class="text-gray-400">
+                {{ book.volumeInfo.authors.join(", ") }}
+              </p>
+            </div>
+            <p class="mb-5">
+              {{
+                book.volumeInfo.description.length > 250
+                  ? book.volumeInfo.description.substring(0, 500) + "..."
+                  : book.volumeInfo.description
+              }}
             </p>
-            <p>{{ book.volumeInfo.description }}</p>
+            <UButton class="text-lg">View Book</UButton>
           </div>
         </div>
       </div>

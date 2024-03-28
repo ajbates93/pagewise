@@ -23,6 +23,9 @@ type googleBooksResponse struct {
 				Type       string `json:"type"`
 				Identifier string `json:"identifier"`
 			} `json:"industryIdentifiers"`
+			ImageLinks struct {
+				Thumbnail string `json:"thumbnail"`
+			} `json:"imageLinks"`
 		} `json:"volumeInfo"`
 	} `json:"items"`
 }
