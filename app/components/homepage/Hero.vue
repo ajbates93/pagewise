@@ -50,11 +50,8 @@
 import type { FormSubmitEvent } from "#ui/types";
 import { z } from "zod";
 import { useAPIFetch } from "~/composables/useAPIFetch";
+import type { BaseAPIResponse } from "~/types/API.ts";
 
-type BaseApiResponse = {
-  success: boolean;
-  message: string;
-};
 const schema = z.object({
   email: z.string().email("Invalid email"),
 });
@@ -68,7 +65,7 @@ const success = ref(false);
 const errorMessage = ref<string>("");
 
 const onSubmit = async (event: FormSubmitEvent<Schema>) => {
-  const { data, pending } = await useAPIFetch<BaseApiResponse>("/waitlist", {
+  const { data, pending } = await useAPIFetch<BaseAPIResponse>("/waitlist", {
     method: "POST",
     body: JSON.stringify(event.data.email),
   });

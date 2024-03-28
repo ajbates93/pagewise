@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"flag"
 	"log/slog"
+	"net/http"
 	"os"
 	"pagewise/internal/data"
 	"pagewise/mailer"
@@ -34,10 +35,11 @@ type config struct {
 }
 
 type application struct {
-	config config
-	logger *slog.Logger
-	models data.Models
-	mailer mailer.Mailer
+	config     config
+	logger     *slog.Logger
+	models     data.Models
+	mailer     mailer.Mailer
+	httpClient *http.Client
 }
 
 func main() {
@@ -76,6 +78,9 @@ func main() {
 		logger: logger,
 		models: data.NewModels(db),
 		mailer: mailer.New(cfg.smtp.host, cfg.smtp.port, cfg.smtp.username, cfg.smtp.password, cfg.smtp.sender),
+		httpClient: &http.Client{
+			Timeout: 10 * time.Second,
+		},
 	}
 
 	err = app.serve()
