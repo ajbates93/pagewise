@@ -17,5 +17,5 @@ func (app *application) routes() http.Handler {
 	// Google Books API
 	router.HandlerFunc(http.MethodGet, "/v1/search", app.searchBooksHandler)
 
-	return router
+	return app.enableCORS(router)
 }
