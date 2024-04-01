@@ -23,7 +23,7 @@
       <div></div>
     </LayoutDeviceHeightContainer>
     <LayoutDeviceHeightContainer>
-      <div>
+      <div ref="searchResultsContainer">
         <h2 class="text-3xl mb-10">Results</h2>
         <div
           id="results"
@@ -43,7 +43,7 @@
           <div class="book-content">
             <div class="book-title mb-5">
               <h3 class="text-xl">{{ book.volumeInfo.title }}</h3>
-              <p class="text-gray-400">
+              <p class="text-gray-400" v-if="book.volumeInfo.authors.length">
                 {{ book.volumeInfo.authors.join(", ") }}
               </p>
             </div>
@@ -64,12 +64,16 @@
 
 <script lang="ts" setup>
 import type { BaseAPIResponse, APIBookResponse } from "~/types/API";
-import { refDebounced } from "@vueuse/core";
+import { useWindowScroll, refDebounced } from "@vueuse/core";
 
 const isLoading = ref<boolean>(false);
 const searchInput = ref<string>("");
 const searchInputDebounced = refDebounced(searchInput, 500);
 const searchResults = ref<APIBookResponse[]>();
+const searchResultsContainer = ref<HTMLDivElement>();
+
+const { y: resultsY } = useElementBounding(searchResultsContainer);
+const { y: scrollY } = useWindowScroll({ behavior: "smooth" });
 
 const handleSearchInput = async () => {
   try {
@@ -81,6 +85,8 @@ const handleSearchInput = async () => {
 
       if (data.value && data.value.success) {
         searchResults.value = data.value.data as APIBookResponse[];
+        // scrollY.value = resultsY.value;
+        scrollY.value = resultsY.value - 50;
       }
     } else if (searchInput.value.length === 0) {
       searchResults.value = [];
